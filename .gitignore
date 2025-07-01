@@ -1,0 +1,71 @@
+# ========================
+# Global Ignore Rules
+# ========================
+*.log
+*.tmp
+*.swp
+*.DS_Store
+.env
+.env.*
+.idea/
+.vscode/
+*.bak
+
+# ========================
+# Java / Spring Boot (dupligone-backend)
+# ========================
+/dupligone-backend/target/
+/dupligone-backend/.classpath
+/dupligone-backend/.project
+/dupligone-backend/.settings
+*.iml
+
+# ========================
+# Python Microservice
+# ========================
+/image-analyzer/__pycache__/
+/image-analyzer/*.pyc
+/image-analyzer/.venv/
+.venv/
+*.egg-info/
+
+# ========================
+# React Frontend (dupligone-frontend)
+# ========================
+/dupligone-frontend/node_modules/
+/dupligone-frontend/dist/
+/dupligone-frontend/build/
+/dupligone-frontend/.next/
+
+# ========================
+# Docker
+# ========================
+**/Dockerfile
+docker-compose.override.yml
+**/*.pid
+**/tmp/
+**/db/data/
+**/redis/data/
+
+# ========================
+# OS Specific
+# ========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ========================
+# Logs and Secrets
+# ========================
+*.log
+*.pem
+*.key
+*.crt
+
+# ========================
+# Misc
+# ========================
+/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
