@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - photo_data:/data/photos
+      - ./dev_photos:/data/photos
     environment:
       - SPRING_PROFILES_ACTIVE=dev
     depends_on:
@@ -27,7 +27,7 @@ services:
     build: ./image-analyzer
     container_name: image-analyzer
     volumes:
-      - photo_data:/data/photos
+      - ./dev_photos:/data/photos
     ports:
       - "5000:5000"
     
@@ -55,5 +55,4 @@ services:
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
   
 volumes:
-  photo_data:
   pg_data:

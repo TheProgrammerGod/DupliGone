@@ -10,7 +10,7 @@
 .idea/
 .vscode/
 *.bak
-
+/dev_photos/
 # ========================
 # Java / Spring Boot (dupligone-backend)
 # ========================
@@ -40,7 +40,6 @@
 # ========================
 # Docker
 # ========================
-**/Dockerfile
 docker-compose.override.yml
 **/*.pid
 **/tmp/

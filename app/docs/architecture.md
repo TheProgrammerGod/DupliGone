@@ -13,7 +13,7 @@ The Photo Library Cleaner system helps users clean up large, unorganized photo l
 
 ## 🧱 High-Level Architecture
 
-```
+```text
               +-----------------+      
               |     Frontend    | (React + Tailwind)
               |-----------------|
@@ -129,7 +129,7 @@ photo-library-cleaner/
 ├── .env               # Shared config values
 └── README.md
 
-```
+```text
 
 ---
 
