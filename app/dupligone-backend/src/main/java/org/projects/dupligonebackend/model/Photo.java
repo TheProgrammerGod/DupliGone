@@ -21,6 +21,9 @@ public class Photo {
     private UUID id;
 
     @Column(nullable = false)
+    private UUID sessionId;
+
+    @Column(nullable = false)
     private String filePath;
 
     @Column(length = 128)

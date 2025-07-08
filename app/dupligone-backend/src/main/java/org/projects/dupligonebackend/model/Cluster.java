@@ -21,6 +21,9 @@ public class Cluster {
     @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false)
+    private UUID sessionId;
+
     private String tag;
     private Instant createdAt;
     private boolean finalized;
