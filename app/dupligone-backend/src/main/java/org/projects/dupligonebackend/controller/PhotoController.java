@@ -1,0 +1,37 @@
+package org.projects.dupligonebackend.controller;
+
+import jakarta.persistence.EntityNotFoundException;
+import org.projects.dupligonebackend.model.Photo;
+import org.projects.dupligonebackend.repository.PhotoRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("api/photos")
+public class PhotoController {
+
+    private final PhotoRepository photoRepository;
+
+    public PhotoController(PhotoRepository photoRepository){
+        this.photoRepository = photoRepository;
+    }
+
+    public ResponseEntity<List<Photo>> gePhotosByCluster(
+            @RequestHeader("X-Session-Id")UUID sessionId,
+            @RequestParam("clusterId") UUID clusterId
+            ){
+        List<Photo> photos = photoRepository.findBySessionIdAndClusterId(sessionId, clusterId);
+        if(photos.isEmpty()){
+            throw new EntityNotFoundException("No photos found for this cluster in this session");
+        }
+
+        return ResponseEntity.ok(photos);
+    }
+
+}

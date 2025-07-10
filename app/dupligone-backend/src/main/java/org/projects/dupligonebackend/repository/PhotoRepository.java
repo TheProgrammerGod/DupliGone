@@ -18,4 +18,6 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
 
     public List<Photo> findBySessionId(UUID sessionId);
 
+    public List<Photo> findBySessionIdAndClusterId(UUID sessionId, UUID clusterId);
+
 }
