@@ -1,5 +1,6 @@
 package org.projects.dupligonebackend.controller;
 
+import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.model.Cluster;
 import org.projects.dupligonebackend.repository.ClusterRepository;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,8 @@ public class ClusterController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cluster>> getAllClusters(
-            @RequestHeader("X-Session-Id")UUID sessionId
-            ){
+    public ResponseEntity<List<Cluster>> getAllClusters(){
+        UUID sessionId = SessionContextHolder.getSessionId();
         List<Cluster> clusters = clusterRepository.findBySessionId(sessionId);
         return ResponseEntity.ok(clusters);
     }
