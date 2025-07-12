@@ -5,10 +5,7 @@ import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.repository.PhotoRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +20,7 @@ public class PhotoController {
         this.photoRepository = photoRepository;
     }
 
+    @GetMapping
     public ResponseEntity<List<Photo>> gePhotosByCluster(
             @RequestParam("clusterId") UUID clusterId
             ){
