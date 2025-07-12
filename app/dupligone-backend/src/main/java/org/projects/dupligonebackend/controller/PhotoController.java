@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.repository.PhotoRepository;
+import org.projects.dupligonebackend.service.PhotoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +15,10 @@ import java.util.UUID;
 @RequestMapping("api/photos")
 public class PhotoController {
 
-    private final PhotoRepository photoRepository;
+    private final PhotoService photoService;
 
-    public PhotoController(PhotoRepository photoRepository){
-        this.photoRepository = photoRepository;
+    public PhotoController(PhotoService photoService){
+        this.photoService = photoService;
     }
 
     @GetMapping
@@ -25,12 +26,7 @@ public class PhotoController {
             @RequestParam("clusterId") UUID clusterId
             ){
         UUID sessionId = SessionContextHolder.getSessionId();
-        List<Photo> photos = photoRepository.findBySessionIdAndClusterId(sessionId, clusterId);
-        if(photos.isEmpty()){
-            throw new EntityNotFoundException("No photos found for this cluster in this session");
-        }
-
-        return ResponseEntity.ok(photos);
+        return ResponseEntity.ok(photoService.getPhotosForCluster(clusterId, sessionId));
     }
 
 }

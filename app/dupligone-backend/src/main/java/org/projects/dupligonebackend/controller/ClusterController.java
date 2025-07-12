@@ -3,6 +3,7 @@ package org.projects.dupligonebackend.controller;
 import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.model.Cluster;
 import org.projects.dupligonebackend.repository.ClusterRepository;
+import org.projects.dupligonebackend.service.ClusterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -16,17 +17,16 @@ import java.util.UUID;
 @RequestMapping("api/clusters")
 public class ClusterController {
 
-    private final ClusterRepository clusterRepository;
+    private final ClusterService clusterService;
 
-    public ClusterController(ClusterRepository clusterRepository){
-        this.clusterRepository = clusterRepository;
+    public ClusterController(ClusterService clusterService){
+        this.clusterService = clusterService;
     }
 
     @GetMapping
     public ResponseEntity<List<Cluster>> getAllClusters(){
         UUID sessionId = SessionContextHolder.getSessionId();
-        List<Cluster> clusters = clusterRepository.findBySessionId(sessionId);
-        return ResponseEntity.ok(clusters);
+        return ResponseEntity.ok(clusterService.getClustersForSession(sessionId));
     }
 
 }
