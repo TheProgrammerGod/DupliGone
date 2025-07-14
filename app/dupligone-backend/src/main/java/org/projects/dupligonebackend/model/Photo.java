@@ -17,7 +17,6 @@ import java.util.UUID;
 public class Photo {
 
     @Id
-    @GeneratedValue
     private UUID id;
 
     @Column(nullable = false)
