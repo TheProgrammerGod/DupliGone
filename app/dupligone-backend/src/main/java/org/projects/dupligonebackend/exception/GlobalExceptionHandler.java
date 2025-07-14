@@ -1,13 +1,17 @@
 package org.projects.dupligonebackend.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingMatrixVariableException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -43,6 +47,19 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleInvalidImage(ConstraintViolationException exception){
+        List<String> errors = exception.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .toList();
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "error", "Validation Failed",
+                        "details", errors
+                ));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneralError(Exception exception){
         return ResponseEntity
@@ -52,5 +69,7 @@ public class GlobalExceptionHandler {
                         "details", exception.getMessage()
                 ));
     }
+
+
 
 }
