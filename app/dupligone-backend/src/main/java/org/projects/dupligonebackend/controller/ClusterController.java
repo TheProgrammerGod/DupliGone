@@ -25,8 +25,7 @@ public class ClusterController {
 
     @GetMapping
     public ResponseEntity<List<Cluster>> getAllClusters(){
-        UUID sessionId = SessionContextHolder.getSessionId();
-        return ResponseEntity.ok(clusterService.getClustersForSession(sessionId));
+        return ResponseEntity.ok(clusterService.getClustersForSession());
     }
 
 }

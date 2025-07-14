@@ -32,17 +32,14 @@ public class PhotoController {
     public ResponseEntity<List<Photo>> gePhotosByCluster(
             @RequestParam("clusterId") UUID clusterId
             ){
-        UUID sessionId = SessionContextHolder.getSessionId();
-        return ResponseEntity.ok(photoService.getPhotosForCluster(clusterId, sessionId));
+        return ResponseEntity.ok(photoService.getPhotosForCluster(clusterId));
     }
 
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadPhotos(
             @RequestParam("files") @Valid @ValidImage List<MultipartFile> files
     ){
-        UUID sessionId = SessionContextHolder.getSessionId();
-        List<PhotoUploadResponse> uploaded = photoService.saveUploadedPhotos(files, sessionId);
-
+        List<PhotoUploadResponse> uploaded = photoService.saveUploadedPhotos(files);
         return ResponseEntity.ok(Map.of("uploaded", uploaded));
     }
 

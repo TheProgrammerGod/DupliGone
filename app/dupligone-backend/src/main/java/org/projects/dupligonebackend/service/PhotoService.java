@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public interface PhotoService {
 
-    List<Photo> getPhotosForCluster(UUID clusterId, UUID sessionId);
+    List<Photo> getPhotosForCluster(UUID clusterId);
 
-    List<PhotoUploadResponse> saveUploadedPhotos(List<MultipartFile> files, UUID sessionId);
+    List<PhotoUploadResponse> saveUploadedPhotos(List<MultipartFile> files);
 
 }

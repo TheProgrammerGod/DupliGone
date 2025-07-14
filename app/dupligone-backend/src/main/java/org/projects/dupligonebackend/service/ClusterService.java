@@ -6,5 +6,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ClusterService {
-    List<Cluster> getClustersForSession(UUID sessionId);
+    List<Cluster> getClustersForSession();
 }

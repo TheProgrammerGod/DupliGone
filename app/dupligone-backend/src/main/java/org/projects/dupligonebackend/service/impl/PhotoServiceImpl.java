@@ -1,6 +1,7 @@
 package org.projects.dupligonebackend.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.dto.PhotoUploadResponse;
 import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.repository.PhotoRepository;
@@ -23,13 +24,14 @@ public class PhotoServiceImpl implements PhotoService {
     @Value("${photo.storage.base-dir}")
     private Path baseDir;
     private final PhotoRepository photoRepository;
+    private final UUID sessionId = SessionContextHolder.getSessionId();
 
     public PhotoServiceImpl(PhotoRepository photoRepository) {
         this.photoRepository = photoRepository;
     }
 
     @Override
-    public List<Photo> getPhotosForCluster(UUID clusterId, UUID sessionId) {
+    public List<Photo> getPhotosForCluster(UUID clusterId) {
         List<Photo> photos = photoRepository.findBySessionIdAndClusterId(sessionId, clusterId);
         if(photos.isEmpty()){
             throw new EntityNotFoundException("No photos found for this cluster in this session");
@@ -38,7 +40,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public List<PhotoUploadResponse> saveUploadedPhotos(List<MultipartFile> files, UUID sessionId) {
+    public List<PhotoUploadResponse> saveUploadedPhotos(List<MultipartFile> files) {
 
         List<PhotoUploadResponse> uploadResponses = new ArrayList<>();
 

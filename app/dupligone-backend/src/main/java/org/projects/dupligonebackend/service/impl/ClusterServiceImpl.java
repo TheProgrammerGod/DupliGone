@@ -1,5 +1,6 @@
 package org.projects.dupligonebackend.service.impl;
 
+import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.model.Cluster;
 import org.projects.dupligonebackend.repository.ClusterRepository;
 import org.projects.dupligonebackend.service.ClusterService;
@@ -12,6 +13,7 @@ import java.util.UUID;
 public class ClusterServiceImpl implements ClusterService {
 
     private final ClusterRepository clusterRepository;
+    private final UUID sessionId = SessionContextHolder.getSessionId();
 
     public ClusterServiceImpl(ClusterRepository clusterRepository) {
         this.clusterRepository = clusterRepository;
@@ -19,7 +21,7 @@ public class ClusterServiceImpl implements ClusterService {
 
 
     @Override
-    public List<Cluster> getClustersForSession(UUID sessionId) {
+    public List<Cluster> getClustersForSession() {
         return clusterRepository.findBySessionId(sessionId);
     }
 }
