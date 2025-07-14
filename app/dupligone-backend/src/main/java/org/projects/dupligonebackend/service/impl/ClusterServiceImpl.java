@@ -13,7 +13,7 @@ import java.util.UUID;
 public class ClusterServiceImpl implements ClusterService {
 
     private final ClusterRepository clusterRepository;
-    private final UUID sessionId = SessionContextHolder.getSessionId();
+    private UUID sessionId;
 
     public ClusterServiceImpl(ClusterRepository clusterRepository) {
         this.clusterRepository = clusterRepository;
@@ -22,6 +22,7 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public List<Cluster> getClustersForSession() {
+        sessionId = SessionContextHolder.getSessionId();
         return clusterRepository.findBySessionId(sessionId);
     }
 }

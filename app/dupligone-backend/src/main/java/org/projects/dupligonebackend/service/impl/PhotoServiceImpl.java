@@ -24,7 +24,7 @@ public class PhotoServiceImpl implements PhotoService {
     @Value("${photo.storage.base-dir}")
     private Path baseDir;
     private final PhotoRepository photoRepository;
-    private final UUID sessionId = SessionContextHolder.getSessionId();
+    private UUID sessionId;
 
     public PhotoServiceImpl(PhotoRepository photoRepository) {
         this.photoRepository = photoRepository;
@@ -32,6 +32,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public List<Photo> getPhotosForCluster(UUID clusterId) {
+        sessionId = SessionContextHolder.getSessionId();
         List<Photo> photos = photoRepository.findBySessionIdAndClusterId(sessionId, clusterId);
         if(photos.isEmpty()){
             throw new EntityNotFoundException("No photos found for this cluster in this session");
@@ -41,6 +42,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public List<PhotoUploadResponse> saveUploadedPhotos(List<MultipartFile> files) {
+        sessionId = SessionContextHolder.getSessionId();
 
         List<PhotoUploadResponse> uploadResponses = new ArrayList<>();
 
