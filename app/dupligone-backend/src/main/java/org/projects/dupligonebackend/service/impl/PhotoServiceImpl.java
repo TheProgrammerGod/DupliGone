@@ -3,6 +3,8 @@ package org.projects.dupligonebackend.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import org.projects.dupligonebackend.context.SessionContextHolder;
 import org.projects.dupligonebackend.dto.PhotoUploadResponse;
+import org.projects.dupligonebackend.dto.PhotoUploadedPublishMessage;
+import org.projects.dupligonebackend.messaging.PhotoEventPublisher;
 import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.repository.PhotoRepository;
 import org.projects.dupligonebackend.service.PhotoService;
@@ -24,10 +26,13 @@ public class PhotoServiceImpl implements PhotoService {
     @Value("${photo.storage.base-dir}")
     private Path baseDir;
     private final PhotoRepository photoRepository;
+    private final PhotoEventPublisher photoEventPublisher;
     private UUID sessionId;
 
-    public PhotoServiceImpl(PhotoRepository photoRepository) {
+    public PhotoServiceImpl(PhotoRepository photoRepository,
+                            PhotoEventPublisher photoEventPublisher) {
         this.photoRepository = photoRepository;
+        this.photoEventPublisher = photoEventPublisher;
     }
 
     @Override
@@ -75,7 +80,9 @@ public class PhotoServiceImpl implements PhotoService {
                 response.setOriginalFilename(file.getOriginalFilename());
                 uploadResponses.add(response);
 
-                // TODO: Send message to RabbitMQ
+                photoEventPublisher.publishPhotoUploaded(
+                        new PhotoUploadedPublishMessage(photo.getId(), photo.getFilePath())
+                );
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
