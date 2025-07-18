@@ -3,7 +3,8 @@
 import os
 import pika
 import json
-from config import RabbitMQConfig
+from config.settings import RabbitMQConfig
+from services.image_loader import load_image
 
 def handle_photo_upload(message: dict):
     # Placeholder for processing the uploaded photo
@@ -12,8 +13,11 @@ def handle_photo_upload(message: dict):
 def callback(ch, method, properties, body):
     try:
         message = json.loads(body)
-        print(f"Received message: {message}")
-        ch.basic_ack(delivery_tag=method.delivery_tag) # Acknowledge the message
+        print(f"[INFO] Received message: {message}")
+        result = load_image(message)
+        if result:
+            image, message = result
+            #TODO : Do image processing here
     except Exception as e:
         print(f"Failed to process message: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
