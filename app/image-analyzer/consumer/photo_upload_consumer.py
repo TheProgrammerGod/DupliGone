@@ -1,13 +1,13 @@
 #consumer/photo_upload_consumer.py
 
-import os
 import pika
 import json
 from config.settings import RabbitMQConfig
 from services.image_loader import load_image
+from services.image_analyzer import compute_image_hashes
 
 def handle_photo_upload(message: dict):
-    # Placeholder for processing the uploaded photo
+    """Handle the photo upload message."""
     print("Processing photo upload:", message)
     
 def callback(ch, method, properties, body):
@@ -15,9 +15,17 @@ def callback(ch, method, properties, body):
         message = json.loads(body)
         print(f"[INFO] Received message: {message}")
         result = load_image(message)
-        if result:
-            image, message = result
-            #TODO : Do image processing here
+        if  not result:
+            return
+        
+        
+        image, message = result
+        hashes = compute_image_hashes(image)
+        print(f"[INFO] Computed hashes for photo_id={message.photo_id}:")
+        for hash_type, hash_value in hashes.items():
+            print(f"{hash_type}: {hash_value}")
+        
+        #Save to DB or publish to another queue as needed
     except Exception as e:
         print(f"Failed to process message: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
