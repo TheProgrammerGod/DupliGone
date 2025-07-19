@@ -19,3 +19,17 @@ def compute_image_hashes(image : np.ndarray) -> dict:
         "dhash": str(imagehash.dhash(pil_image)),
         "whash": str(imagehash.whash(pil_image)),
     }
+
+def calculate_sharpness(image : np.ndarray) -> float:
+    """Calculate the sharpness of an image using the Laplacian variance method.
+    Args:
+        image (np.ndarray): The input image in BGR format.
+    
+    Returns:
+        float: The sharpness score (higher means sharper).
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+    variance = laplacian.var()
+    
+    return variance

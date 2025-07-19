@@ -18,7 +18,6 @@ def callback(ch, method, properties, body):
         if  not result:
             return
         
-        
         image, message = result
         hashes = compute_image_hashes(image)
         print(f"[INFO] Computed hashes for photo_id={message.photo_id}:")
