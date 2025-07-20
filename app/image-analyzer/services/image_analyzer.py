@@ -64,3 +64,14 @@ def calculate_face_metrics(image : np.ndarray) -> dict:
         "smile_score": round(smile_score, 2)  # Round to 2 decimal places
     }
     
+    def calculate_exposure_flatness(image : np.ndarray) -> float:
+        """Calculate exposure flatness as the variance of normalized grayscale histogram."""
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+        hist = hist / hist.sum() # Normalize histogram
+        
+        # Compute variance of histogram - captures distribution "sharpness"
+        flatness_score = np.var(hist)
+        
+        return float(flatness_score)
+    
