@@ -6,9 +6,6 @@ from config.settings import RabbitMQConfig
 from services.image_loader import load_image
 from services.image_analyzer import compute_image_hashes
 
-def handle_photo_upload(message: dict):
-    """Handle the photo upload message."""
-    print("Processing photo upload:", message)
     
 def callback(ch, method, properties, body):
     try:

@@ -33,3 +33,17 @@ def calculate_sharpness(image : np.ndarray) -> float:
     variance = laplacian.var()
     
     return variance
+
+def calculate_brightness(image : np.ndarray) -> float:
+    """
+    Calculates the brightness of an image using the mean intensity of grayscale pixels.
+
+    Args:
+        image (np.ndarray): The input image in BGR format.
+
+    Returns:
+        float: Brightness score (0 to 255, higher means brighter).
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
+    brightness = gray.mean() # Mean intensity value
+    return brightness
