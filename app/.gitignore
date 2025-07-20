@@ -28,6 +28,7 @@
 /image-analyzer/.venv/
 .venv/
 *.egg-info/
+__pycache__/
 
 # ========================
 # React Frontend (dupligone-frontend)

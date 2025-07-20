@@ -4,7 +4,7 @@ import pika
 import json
 from config.settings import RabbitMQConfig
 from services.image_loader import load_image
-from services.image_analyzer import compute_image_hashes
+from services.image_analyzer import analyze_image
 
     
 def callback(ch, method, properties, body):
@@ -16,11 +16,9 @@ def callback(ch, method, properties, body):
             return
         
         image, message = result
-        hashes = compute_image_hashes(image)
-        print(f"[INFO] Computed hashes for photo_id={message.photo_id}:")
-        for hash_type, hash_value in hashes.items():
-            print(f"{hash_type}: {hash_value}")
-        
+        metrics = analyze_image(image)
+        print(f"[INFO] Analyzed metrics for {message.photo_id}: {metrics}")
+
         #Save to DB or publish to another queue as needed
     except Exception as e:
         print(f"Failed to process message: {e}")

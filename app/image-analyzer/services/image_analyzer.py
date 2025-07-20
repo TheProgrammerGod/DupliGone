@@ -5,8 +5,8 @@ import numpy as np
 from pathlib import Path
 
 #Load Haar Cascades
-_face_cascade = cv2.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_default.xml')
-_smile_cascade = cv2.CascadeClassifier(cv.data.haarcascades + 'haarcascade_smile.xml')
+_face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+_smile_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
 
 def cv2_to_pil(cv_image: np.ndarray) -> Image.Image:
     """Convert a cv2 image to a PIL Image."""
@@ -26,34 +26,30 @@ def compute_image_hashes(image : np.ndarray) -> dict:
 
 def calculate_sharpness(image : np.ndarray) -> float:
     """Calculate the sharpness of an image using the Laplacian variance method."""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
-    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+    laplacian = cv2.Laplacian(image, cv2.CV_64F)
     variance = laplacian.var()
     
     return variance
 
 def calculate_brightness(image : np.ndarray) -> float:
     """Calculates the brightness of an image using the mean intensity of grayscale pixels."""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
-    brightness = gray.mean() # Mean intensity value
+    brightness = image.mean() # Mean intensity value
     return brightness
 
 def calculate_contrast(image : np.ndarray) -> float:
     """Calculates the contrast of an image using the standard deviation of pixel intensities."""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
-    contrast = gray.std() # Standard deviation of pixel intensities
+    contrast = image.std() # Standard deviation of pixel intensities
     return contrast
 
 def calculate_face_metrics(image : np.ndarray) -> dict:
     """Detect faces and smiles in the image."""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
-    faces = _face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+    faces = _face_cascade.detectMultiScale(image, scaleFactor=1.1, minNeighbors=5)
     
     smile_count = 0
     for (x, y, w, h) in faces:
-        roi_gray = gray[y:y+h, x:x+w]
+        roi_gray = image[y:y+h, x:x+w]
         smiles = _smile_cascade.detectMultiScale(roi_gray, scaleFactor=1.7, minNeighbors=22)
-        if(smiles > 0):
+        if(len(smiles) > 0):
             smile_count += 1
     
     face_count = len(faces)
@@ -66,12 +62,33 @@ def calculate_face_metrics(image : np.ndarray) -> dict:
     
 def calculate_exposure_flatness(image : np.ndarray) -> float:
     """Calculate exposure flatness as the variance of normalized grayscale histogram."""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+    hist = cv2.calcHist([image], [0], None, [256], [0, 256])
     hist = hist / hist.sum() # Normalize histogram
     
     # Compute variance of histogram - captures distribution "sharpness"
     flatness_score = np.var(hist)
     
     return float(flatness_score)
+
+def analyze_image(image : np.ndarray) -> dict:
+    """"Analyze the image and return various metrics."""
+    
+    hashes = compute_image_hashes(image)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
+    sharpness = calculate_sharpness(gray)
+    brightness = calculate_brightness(gray)
+    contrast = calculate_contrast(gray)
+    face_metrics = calculate_face_metrics(gray)
+    exposure_flatness = calculate_exposure_flatness(gray)
+    
+    return {
+        **hashes,
+        "sharpness" : sharpness,
+        "brightness" : brightness,
+        "contrast" : contrast,
+        "exposure_flatness" : exposure_flatness,
+        **face_metrics
+    }
+    
+    
     
