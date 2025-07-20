@@ -21,29 +21,21 @@ def compute_image_hashes(image : np.ndarray) -> dict:
     }
 
 def calculate_sharpness(image : np.ndarray) -> float:
-    """Calculate the sharpness of an image using the Laplacian variance method.
-    Args:
-        image (np.ndarray): The input image in BGR format.
-    
-    Returns:
-        float: The sharpness score (higher means sharper).
-    """
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    """Calculate the sharpness of an image using the Laplacian variance method."""
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
     laplacian = cv2.Laplacian(gray, cv2.CV_64F)
     variance = laplacian.var()
     
     return variance
 
 def calculate_brightness(image : np.ndarray) -> float:
-    """
-    Calculates the brightness of an image using the mean intensity of grayscale pixels.
-
-    Args:
-        image (np.ndarray): The input image in BGR format.
-
-    Returns:
-        float: Brightness score (0 to 255, higher means brighter).
-    """
+    """Calculates the brightness of an image using the mean intensity of grayscale pixels."""
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
     brightness = gray.mean() # Mean intensity value
     return brightness
+
+def calculate_contrast(image : np.ndarray) -> float:
+    """Calculates the contrast of an image using the standard deviation of pixel intensities."""
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert to grayscale
+    contrast = gray.std() # Standard deviation of pixel intensities
+    return contrast
