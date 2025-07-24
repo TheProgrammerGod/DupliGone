@@ -26,10 +26,19 @@ public class Photo {
     private String filePath;
 
     @Column(length = 128)
-    private String hash;
+    private String ahash;
+    @Column(length = 128)
+    private String phash;
+    @Column(length = 128)
+    private String dhash;
+    @Column(length = 128)
+    private String whash;
 
-    private Integer brightness;
-    private Integer sharpness;
+    private double brightness;
+    private double sharpness;
+    private double contrast;
+    private double exposureFlatness;
+    private double smileScore;
     private Integer faceCount;
 
     private boolean isBest;
