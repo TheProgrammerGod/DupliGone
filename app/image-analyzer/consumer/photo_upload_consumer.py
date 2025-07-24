@@ -5,6 +5,7 @@ import json
 from config.settings import RabbitMQConfig
 from services.image_loader import load_image
 from services.image_analyzer import analyze_image
+from services.db_service import update_photo_metrics
 
     
 def callback(ch, method, properties, body):
@@ -18,10 +19,12 @@ def callback(ch, method, properties, body):
         image, message = result
         metrics = analyze_image(image)
         print(f"[INFO] Analyzed metrics for {message.photo_id}: {metrics}")
-
-        #Save to DB or publish to another queue as needed
+        
+        update_photo_metrics(message.photo_id, metrics)
+        print(f"[INFO] Saved metrics to DB for photo ID: {message.photo_id}")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as e:
-        print(f"Failed to process message: {e}")
+        print(f"[ERROR] Failed to process message: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
 def start_consumer():
@@ -43,5 +46,5 @@ def start_consumer():
     
     #Start consuming messages from the queue
     channel.basic_consume(queue=queue_name, on_message_callback=callback)
-    print(f"Listening for messages on queue: {queue_name}. To exit press CTRL+C")
+    print(f"[INFO] Listening for messages on queue: {queue_name}. To exit press CTRL+C")
     channel.start_consuming()
