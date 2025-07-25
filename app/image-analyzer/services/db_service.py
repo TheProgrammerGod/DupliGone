@@ -33,6 +33,7 @@ def update_photo_metrics(photo_id : str, metrics: dict):
                 phash = %s,
                 dhash = %s,
                 whash = %s
+                analyzed_at = NOW()
             WHERE id = %s
             """
             cursor.execute(query,(
