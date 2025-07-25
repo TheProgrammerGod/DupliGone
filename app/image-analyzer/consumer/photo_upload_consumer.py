@@ -10,9 +10,9 @@ from services.db_service import update_photo_metrics
     
 def callback(ch, method, properties, body):
     try:
-        message = json.loads(body)
-        print(f"[INFO] Received message: {message}")
-        result = load_image(message)
+#        message = json.loads(body)
+        print(f"[INFO] Received message: {body}")
+        result = load_image(body)
         if  not result:
             return
         
@@ -29,9 +29,9 @@ def callback(ch, method, properties, body):
 
 def start_consumer():
     #Load RabbitMQ configuration from environment variables
-    rabbitmq_host = RabbitMQConfig.RABBITMQ_HOST
-    rabbitmq_user = RabbitMQConfig.RABBITMQ_USER
-    rabbitmq_pass = RabbitMQConfig.RABBITMQ_PASS
+    rabbitmq_host = RabbitMQConfig.HOST
+    rabbitmq_user = RabbitMQConfig.USER
+    rabbitmq_pass = RabbitMQConfig.PASSWORD
     queue_name = RabbitMQConfig.QUEUE_NAME
     
     #Setup credentials and connection parameters

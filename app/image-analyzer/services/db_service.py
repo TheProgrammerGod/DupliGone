@@ -8,11 +8,11 @@ def get_connection():
     global db_connection
     if db_connection is None:
         db_connection = psycopg2.connect(
-            dbname=DBConfig.DB_NAME,
-            user=DBConfig.DB_USER,
-            password=DBConfig.DB_PASSWORD,
-            host=DBConfig.DB_HOST,
-            port=DBConfig.DB_PORT,
+            dbname=DBConfig.DATABASE,
+            user=DBConfig.USER,
+            password=DBConfig.PASSWORD,
+            host=DBConfig.HOST,
+            port=DBConfig.PORT,
             cursor_factory=RealDictCursor
         )
     return db_connection
@@ -22,7 +22,7 @@ def update_photo_metrics(photo_id : str, metrics: dict):
     try:
         with conn.cursor() as cursor:
             query = """
-            UPDATE photos
+            UPDATE photo
             SET brightness = %s,
                 contrast = %s,
                 sharpness = %s,
@@ -50,4 +50,4 @@ def update_photo_metrics(photo_id : str, metrics: dict):
             ))
     finally:
         conn.commit()
-        conn.close()
+        # conn.close()

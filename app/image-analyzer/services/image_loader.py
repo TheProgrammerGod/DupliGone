@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from dto.photo_uploaded_message import PhotoUploadedMessage
 
 def load_image(body: bytes):
+    BASE_DIR = Path("../dev_photos") #Fix this path when deploying using Docker
     try:
         data = json.loads(body)
         message = PhotoUploadedMessage(**data)
@@ -13,7 +14,7 @@ def load_image(body: bytes):
         print(f"[ERROR] Invalid message format: {e}")
         return
     
-    image_path = message.photo_path
+    image_path = BASE_DIR / message.photo_path
     if not image_path.exists():
         print(f"[ERROR] File does not exist: {image_path}")
         return

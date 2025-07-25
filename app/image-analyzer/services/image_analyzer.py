@@ -29,17 +29,17 @@ def calculate_sharpness(image : np.ndarray) -> float:
     laplacian = cv2.Laplacian(image, cv2.CV_64F)
     variance = laplacian.var()
     
-    return variance
+    return float(variance)
 
 def calculate_brightness(image : np.ndarray) -> float:
     """Calculates the brightness of an image using the mean intensity of grayscale pixels."""
     brightness = image.mean() # Mean intensity value
-    return brightness
+    return float(brightness)
 
 def calculate_contrast(image : np.ndarray) -> float:
     """Calculates the contrast of an image using the standard deviation of pixel intensities."""
     contrast = image.std() # Standard deviation of pixel intensities
-    return contrast
+    return float(contrast)
 
 def calculate_face_metrics(image : np.ndarray) -> dict:
     """Detect faces and smiles in the image."""

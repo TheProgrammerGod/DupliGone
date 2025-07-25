@@ -12,9 +12,9 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
 
     public List<Photo> findByIsBestTrue();
 
-    public List<Photo> findByHash(String hash);
-
-    public boolean existsByHash(String hash);
+//    public List<Photo> findByHash(String hash);
+//
+//    public boolean existsByHash(String hash);
 
     public List<Photo> findBySessionId(UUID sessionId);
 
