@@ -18,7 +18,6 @@ import java.util.UUID;
 public class Cluster {
 
     @Id
-    @GeneratedValue
     private UUID id;
 
     @Column(nullable = false)
