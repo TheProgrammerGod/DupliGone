@@ -1,6 +1,8 @@
 package org.projects.dupligonebackend.controller;
 
 
+import org.projects.dupligonebackend.model.PhotoSession;
+import org.projects.dupligonebackend.service.PhotoSessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +14,16 @@ import java.util.UUID;
 @RequestMapping(path = "api/session")
 public class SessionController {
 
+    private final PhotoSessionService service;
+
+    public SessionController(PhotoSessionService service){
+        this.service = service;
+    }
+
     @PostMapping("/start")
     public ResponseEntity<UUID> startSession(){
-        UUID sessionId = UUID.randomUUID();
-        return ResponseEntity.ok(sessionId);
+        PhotoSession session = service.createSession();
+        return ResponseEntity.ok(session.getId());
     }
 
 }
