@@ -16,7 +16,7 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
 //
 //    public boolean existsByHash(String hash);
 
-    public List<Photo> findBySessionId(UUID sessionId);
+    public List<Photo> findAllBySessionId(UUID sessionId);
 
     public List<Photo> findBySessionIdAndClusterId(UUID sessionId, UUID clusterId);
 
