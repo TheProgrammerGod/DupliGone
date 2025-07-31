@@ -5,6 +5,7 @@ import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.model.PhotoSession;
 import org.projects.dupligonebackend.repository.PhotoRepository;
 import org.projects.dupligonebackend.repository.PhotoSessionRepository;
+import org.projects.dupligonebackend.service.ClusterService;
 import org.projects.dupligonebackend.service.PhotoSessionService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ public class PhotoSessionServiceImpl implements PhotoSessionService {
 
     private final PhotoSessionRepository sessionRepository;
     private final PhotoRepository photoRepository;
+    private final ClusterService clusterService;
 
     public PhotoSessionServiceImpl(PhotoSessionRepository sessionRepository,
-                                   PhotoRepository photoRepository){
+                                   PhotoRepository photoRepository,
+                                   ClusterService clusterService){
         this.sessionRepository = sessionRepository;
         this.photoRepository = photoRepository;
+        this.clusterService = clusterService;
     }
 
     @Override
@@ -53,6 +57,7 @@ public class PhotoSessionServiceImpl implements PhotoSessionService {
                 sessionRepository.save(session);
                 try{
                     // TODO: Trigger clustering logic
+                    clusterService.runClusterJob(session);
 
                     session.setClusteringStatus("COMPLETED");
                 } catch (Exception e){
