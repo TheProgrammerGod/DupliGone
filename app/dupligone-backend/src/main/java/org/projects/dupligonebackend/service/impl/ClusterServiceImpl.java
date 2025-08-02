@@ -10,8 +10,8 @@ import org.projects.dupligonebackend.service.ClusterService;
 import org.projects.dupligonebackend.utils.PhotoHashVector;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,11 +51,11 @@ public class ClusterServiceImpl implements ClusterService {
 
         // Conver hash strings to bit arrays or long ints
         List<PhotoHashVector> vectors = photos.stream()
-                .map(photo -> new PhotoHashVector(photo, extractCombinedHashVector(photo)))
+                .map(photo -> new PhotoHashVector(photo, extractCombinedHashVector(photo), photo.getSessionId()))
                 .toList();
 
         // run DBSCAN
-        List<Cluster> clusters =
+        List<Cluster> clusters = runDBSCAN(vectors);
 
         return clusters;
     }
@@ -68,6 +68,54 @@ public class ClusterServiceImpl implements ClusterService {
           Long.parseUnsignedLong(photo.getDhash(), 16),
           Long.parseUnsignedLong(photo.getWhash(), 16)
         };
+    }
+
+    private List<Cluster> runDBSCAN(List<PhotoHashVector> vectors){
+        int eps = 45, minPts = 2;
+        List<Cluster> clusters = new ArrayList<>();
+        Set<PhotoHashVector> visited = new HashSet<>();
+        Set<PhotoHashVector> clustered = new HashSet<>();
+
+        for(PhotoHashVector point : vectors){
+            if(visited.contains(point))
+                continue;
+            visited.add(point);
+
+            List<PhotoHashVector> neighbors = getNeighbors(point, vectors, eps);
+            if(neighbors.size() < minPts)
+                continue;
+
+            Cluster cluster = new Cluster();
+            cluster.setId(UUID.randomUUID());
+            cluster.setSessionId(point.getSessionID());
+            cluster.setCreatedAt(Instant.now());
+            cluster.getPhotos().add(point.getPhoto());
+            clustered.add(point);
+            Queue<PhotoHashVector> queue = new LinkedList<>(neighbors);
+
+            while(!queue.isEmpty()){
+                PhotoHashVector neighbor = queue.poll();
+                if(!visited.contains(neighbor)){
+                    visited.add(neighbor);
+                    List<PhotoHashVector> neighborNeighbors = getNeighbors(neighbor, vectors, eps);
+                    if(neighborNeighbors.size() >= minPts)
+                        queue.addAll(neighborNeighbors);
+                }
+
+                if(!clustered.contains(neighbor)){
+                    cluster.getPhotos().add(neighbor.getPhoto());
+                    clustered.add(neighbor);
+                }
+            }
+            clusters.add(cluster);
+        }
+        return clusters;
+    }
+
+    private List<PhotoHashVector> getNeighbors(PhotoHashVector p, List<PhotoHashVector> all, int eps){
+        return all.stream()
+                .filter(other -> !p.equals(other) && p.hammingDistanceTo(other) <= eps)
+                .collect(Collectors.toList());
     }
 
 }
