@@ -6,12 +6,14 @@ import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.model.PhotoSession;
 import org.projects.dupligonebackend.repository.ClusterRepository;
 import org.projects.dupligonebackend.repository.PhotoRepository;
+import org.projects.dupligonebackend.repository.PhotoSessionRepository;
 import org.projects.dupligonebackend.service.ClusterService;
 import org.projects.dupligonebackend.utils.PhotoHashVector;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,11 +21,14 @@ public class ClusterServiceImpl implements ClusterService {
 
     private final ClusterRepository clusterRepository;
     private final PhotoRepository photoRepository;
+    private final PhotoSessionRepository sessionRepository;
 
     public ClusterServiceImpl(ClusterRepository clusterRepository,
-                              PhotoRepository photoRepository) {
+                              PhotoRepository photoRepository,
+                              PhotoSessionRepository sessionRepository) {
         this.clusterRepository = clusterRepository;
         this.photoRepository = photoRepository;
+        this.sessionRepository = sessionRepository;
     }
 
 
@@ -39,8 +44,24 @@ public class ClusterServiceImpl implements ClusterService {
         List<Cluster> clusters = cluster(photos);
 
         for(Cluster cluster : clusters){
-            
+            UUID bestPhotoId = selectBestPhoto(cluster.getPhotos());
+            markAndSavePhotos(cluster.getPhotos(), bestPhotoId);
         }
+
+        // TODO: write the clusters found to DB
+
+        session.setClusteringStatus("COMPLETED");
+        sessionRepository.save(session);
+    }
+
+    private void markAndSavePhotos(List<Photo> photos, UUID bestPhotoId) {
+        for(Photo photo : photos) {
+            if (photo.getId() == bestPhotoId) {
+                photo.setBest(true);
+                break;
+            }
+        }
+        photoRepository.saveAll(photos);
     }
 
     private List<Photo> getAnalyzedPhotosForSession(UUID sessionId){
@@ -90,6 +111,7 @@ public class ClusterServiceImpl implements ClusterService {
             cluster.setSessionId(point.getSessionID());
             cluster.setCreatedAt(Instant.now());
             cluster.getPhotos().add(point.getPhoto());
+            point.getPhoto().setCluster(cluster);
             clustered.add(point);
             Queue<PhotoHashVector> queue = new LinkedList<>(neighbors);
 
@@ -104,9 +126,11 @@ public class ClusterServiceImpl implements ClusterService {
 
                 if(!clustered.contains(neighbor)){
                     cluster.getPhotos().add(neighbor.getPhoto());
+                    neighbor.getPhoto().setCluster(cluster);
                     clustered.add(neighbor);
                 }
             }
+            cluster.setFinalized(true);
             clusters.add(cluster);
         }
         return clusters;
@@ -118,4 +142,64 @@ public class ClusterServiceImpl implements ClusterService {
                 .collect(Collectors.toList());
     }
 
+    private UUID selectBestPhoto(List<Photo> photos){
+        if(photos == null || photos.isEmpty())
+            throw new IllegalArgumentException("Photo list is empty");
+
+        double maxSharp = getMax(photos, Photo::getSharpness);
+        double minSharp = getMin(photos, Photo::getSharpness);
+
+        double maxBright = getMax(photos, Photo::getBrightness);
+        double minBright = getMin(photos, Photo::getBrightness);
+
+        double maxContrast = getMax(photos, Photo::getContrast);
+        double minContrast = getMin(photos, Photo::getContrast);
+
+        double maxFace = getMax(photos, Photo::getFaceCount);
+        double minFace = getMin(photos, Photo::getFaceCount);
+
+        double maxSmile = getMax(photos, Photo::getSmileScore);
+        double minSmile = getMin(photos, Photo::getSmileScore);
+
+        double maxExposure = getMax(photos, Photo::getExposureFlatness);
+        double minExposure = getMin(photos, Photo::getExposureFlatness);
+
+        double bestScore = Double.NEGATIVE_INFINITY;
+        UUID bestPhotoId = null;
+
+        for(Photo photo : photos){
+            double score = 0.0;
+
+            score += 0.3 * normalize(photo.getSharpness(), minSharp, maxSharp);
+            score += 0.2 * normalize(photo.getBrightness(), minBright, maxBright);
+            score += 0.1 * normalize(photo.getContrast(), minContrast, maxContrast);
+            score += 0.2 * normalize(photo.getFaceCount(), minFace, maxFace);
+            score += 0.1 * normalize(photo.getSmileScore(), minSmile, maxSmile);
+
+            // Exposure Flatness is better when lower, so we inverse the normalization
+            score += 0.1 * (1.0 - normalize(photo.getExposureFlatness(), minExposure, maxExposure));
+
+            if(score > bestScore){
+                bestScore = score;
+                bestPhotoId = photo.getId();
+            }
+        }
+
+        return bestPhotoId;
+    }
+
+    private double getMax(List<Photo> photos, ToDoubleFunction<Photo> extractor){
+        return photos.stream().mapToDouble(extractor).max().orElse(0.0);
+    }
+
+    private double getMin(List<Photo> photos, ToDoubleFunction<Photo> extractor){
+        return photos.stream().mapToDouble(extractor).min().orElse(0.0);
+    }
+
+    private double normalize(double value, double min, double max){
+        if(max == min)
+            return 0.0;
+
+        return (value - min)/(max - min);
+    }
 }
