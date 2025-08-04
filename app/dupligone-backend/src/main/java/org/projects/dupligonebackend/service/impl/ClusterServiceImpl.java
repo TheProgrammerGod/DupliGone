@@ -1,6 +1,8 @@
 package org.projects.dupligonebackend.service.impl;
 
 import org.projects.dupligonebackend.context.SessionContextHolder;
+import org.projects.dupligonebackend.dto.ClusterResponseDto;
+import org.projects.dupligonebackend.dto.PhotoResponseDto;
 import org.projects.dupligonebackend.model.Cluster;
 import org.projects.dupligonebackend.model.Photo;
 import org.projects.dupligonebackend.model.PhotoSession;
@@ -33,9 +35,30 @@ public class ClusterServiceImpl implements ClusterService {
 
 
     @Override
-    public List<Cluster> getClustersForSession() {
+    public List<ClusterResponseDto> getClustersForSession() {
         UUID sessionId = SessionContextHolder.getSessionId();
-        return clusterRepository.findBySessionId(sessionId);
+        List<Cluster> clusters = clusterRepository.findBySessionId(sessionId);
+
+        return clusters.stream().map(cluster -> {
+            List<PhotoResponseDto> photos = cluster.getPhotos().stream()
+                    .map(photo -> new PhotoResponseDto(
+                            photo.getId(),
+                            photo.getFilePath()
+                    ))
+                    .toList();
+            UUID bestPhotoId = null;
+            for(Photo photo : cluster.getPhotos()){
+                if(photo.isBest()){
+                    bestPhotoId = photo.getId();
+                    break;
+                }
+            }
+            return new ClusterResponseDto(
+                    cluster.getId(),
+                    bestPhotoId,
+                    photos
+            );
+        }).toList();
     }
 
     @Override
@@ -47,9 +70,8 @@ public class ClusterServiceImpl implements ClusterService {
             UUID bestPhotoId = selectBestPhoto(cluster.getPhotos());
             markAndSavePhotos(cluster.getPhotos(), bestPhotoId);
         }
-
-        // TODO: write the clusters found to DB
-
+        
+        clusterRepository.saveAll(clusters);
         session.setClusteringStatus("COMPLETED");
         sessionRepository.save(session);
     }

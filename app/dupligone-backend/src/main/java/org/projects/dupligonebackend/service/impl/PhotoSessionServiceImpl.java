@@ -56,7 +56,6 @@ public class PhotoSessionServiceImpl implements PhotoSessionService {
                 session.setClusteringStatus("IN_PROGRESS");
                 sessionRepository.save(session);
                 try{
-                    // TODO: Trigger clustering logic
                     clusterService.runClusterJob(session);
 
                     session.setClusteringStatus("COMPLETED");

@@ -1,6 +1,7 @@
 package org.projects.dupligonebackend.controller;
 
 import org.projects.dupligonebackend.context.SessionContextHolder;
+import org.projects.dupligonebackend.dto.ClusterResponseDto;
 import org.projects.dupligonebackend.model.Cluster;
 import org.projects.dupligonebackend.repository.ClusterRepository;
 import org.projects.dupligonebackend.service.ClusterService;
@@ -24,7 +25,7 @@ public class ClusterController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cluster>> getAllClusters(){
+    public ResponseEntity<List<ClusterResponseDto>> getAllClusters(){
         return ResponseEntity.ok(clusterService.getClustersForSession());
     }
 
