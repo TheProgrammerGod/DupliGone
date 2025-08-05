@@ -72,8 +72,6 @@ public class ClusterServiceImpl implements ClusterService {
         }
         
         clusterRepository.saveAll(clusters);
-        session.setClusteringStatus("COMPLETED");
-        sessionRepository.save(session);
     }
 
     private void markAndSavePhotos(List<Photo> photos, UUID bestPhotoId) {
@@ -132,8 +130,9 @@ public class ClusterServiceImpl implements ClusterService {
             cluster.setId(UUID.randomUUID());
             cluster.setSessionId(point.getSessionID());
             cluster.setCreatedAt(Instant.now());
+            cluster.setPhotos(new ArrayList<>());
             cluster.getPhotos().add(point.getPhoto());
-            point.getPhoto().setCluster(cluster);
+            //point.getPhoto().setCluster(cluster);
             clustered.add(point);
             Queue<PhotoHashVector> queue = new LinkedList<>(neighbors);
 
@@ -148,7 +147,7 @@ public class ClusterServiceImpl implements ClusterService {
 
                 if(!clustered.contains(neighbor)){
                     cluster.getPhotos().add(neighbor.getPhoto());
-                    neighbor.getPhoto().setCluster(cluster);
+                    //neighbor.getPhoto().setCluster(cluster);
                     clustered.add(neighbor);
                 }
             }
