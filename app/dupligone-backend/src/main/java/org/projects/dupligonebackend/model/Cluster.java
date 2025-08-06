@@ -1,10 +1,7 @@
 package org.projects.dupligonebackend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,6 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "photos")
+@EqualsAndHashCode(exclude = "photos")
 public class Cluster {
 
     @Id
@@ -29,5 +28,10 @@ public class Cluster {
 
     @OneToMany(mappedBy = "cluster", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos;
+
+    public void addPhoto(Photo photo){
+        this.photos.add(photo);
+        photo.setCluster(this);
+    }
 
 }

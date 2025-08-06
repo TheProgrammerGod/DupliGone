@@ -90,7 +90,7 @@ public class ClusterServiceImpl implements ClusterService {
 
     private List<Cluster> cluster(List<Photo> photos){
 
-        // Conver hash strings to bit arrays or long ints
+        // Convert hash strings to bit arrays or long int
         List<PhotoHashVector> vectors = photos.stream()
                 .map(photo -> new PhotoHashVector(photo, extractCombinedHashVector(photo), photo.getSessionId()))
                 .toList();
@@ -131,7 +131,7 @@ public class ClusterServiceImpl implements ClusterService {
             cluster.setSessionId(point.getSessionID());
             cluster.setCreatedAt(Instant.now());
             cluster.setPhotos(new ArrayList<>());
-            cluster.getPhotos().add(point.getPhoto());
+            cluster.addPhoto(point.getPhoto());
             //point.getPhoto().setCluster(cluster);
             clustered.add(point);
             Queue<PhotoHashVector> queue = new LinkedList<>(neighbors);
@@ -146,7 +146,7 @@ public class ClusterServiceImpl implements ClusterService {
                 }
 
                 if(!clustered.contains(neighbor)){
-                    cluster.getPhotos().add(neighbor.getPhoto());
+                    cluster.addPhoto(neighbor.getPhoto());
                     //neighbor.getPhoto().setCluster(cluster);
                     clustered.add(neighbor);
                 }
